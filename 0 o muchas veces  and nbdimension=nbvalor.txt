@@ -1,0 +1,30 @@
+jproba:-write('{"jproba":'),arbol, write('}').
+ arbol:-write('{"nbarbol":"'),read(Nbarbol),write(Nbarbol),write('", "frecuencia":'),frecuencia(Nbarbol), write('}').
+ frecuencia(Nbarbol):-write('"select count(*) from '),write(Nbarbol),write(';"'),write(','),dimension(Nbarbol).
+ dimension(Nbarbol):-write('{"nbdimension":"'),read(Nbdimension),write(Nbdimension),write('",'),valor(Nbarbol,Nbdimension).
+ valor(Nbarbol,Nbdimension):-write('{"nbvalor":"'),read(Nbvalor),write(Nbvalor),write('", "frecuencia":'),frecvalor(Nbarbol,Nbdimension,Nbvalor),aux1(Nbarbol,Nbdimension).
+ frecvalor(Nbarbol,Nbdimension,Nbvalor):-write('"select count(*) from '),write(Nbarbol),write(' where '),write(Nbdimension),write('="'),write(Nbvalor),aux0(Nbarbol,Nbdimension).
+ aux0(Nbarbol,Nbdimension):-read(X),(X='and'->write(' and '),read(Nbdimension2),write(Nbdimension2),write('="'),read(Nbvalor2),write(Nbvalor2),write('";'),aux00(Nbarbol,Nbdimension);write('"}'),aux1(X,Nbarbol,Nbdimension)).
+ aux00(Nbarbol,Nbdimension):-read(X),aux1(X,Nbarbol,Nbdimension).
+ aux1(X,Nbarbol,Nbdimension):-(X='valor'->write(','),valor(Nbarbol,Nbdimension);write('}'),aux2(X,Nbarbol)).
+ aux2(X,Nbarbol):-(X='findimension'->write('}');aux3(X,Nbarbol)).
+ aux3(X,Nbarbol):-(X='dimension'->write('},'),dimension(Nbarbol)).
+ :-jproba.
+
+
+Entrada:
+empresas.
+materia.
+ingenieria_del_conocimiento.
+and.
+industria.
+a.
+dimension.
+industria.
+a.
+valor.
+b.
+findimension.
+
+Salida:
+{"jproba":{"nbarbol":"empresas", "frecuencia":"select count(*) from empresas;",{"nbdimension":"materia",{"nbvalor":"ingenieria_del_conocimiento", "frecuencia":"select count(*) from empresas where materia="ingenieria_del_conocimiento and industria="a";}},{"nbdimension":"industria",{"nbvalor":"a", "frecuencia":"select count(*) from empresas where industria="a"},{"nbvalor":"b", "frecuencia":"select count(*) from empresas where industria="b"}}}
