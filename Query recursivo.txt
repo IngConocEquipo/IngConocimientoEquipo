@@ -1,0 +1,22 @@
+jproba:-write('{"jproba":'),arbol, write('}').
+ arbol:-write('{"nbarbol":"'),read(Nbarbol),write(Nbarbol),write('", "frecuencia":'),frecuencia(Nbarbol), write('}').
+ frecuencia(Nbarbol):-write('"select count(*) from '),write(Nbarbol),write(';"'),write(','),dimension(Nbarbol).
+ dimension(Nbarbol):-write('{"nbdimension":"'),read(Nbdimension),write(Nbdimension),write('",'),puerta(Nbarbol,Nbdimension).
+ puerta(Nbarbol,Nbdimension):-write('"select '),write(Nbdimension),write(', '),write('count(*)/(select count(*)from '),write(Nbarbol),write(') from '),write(Nbarbol),write(' where '),write(Nbdimension),write(' in(select distinct '),write(Nbdimension),write(' from '),write(Nbarbol),write(') group by '),write(Nbdimension),write(';"'),aux1(Nbarbol,Nbdimension).
+ aux1(Nbarbol,Nbdimension):-read(Otradim),(Otradim='add'->dimension2(Nbarbol,Nbdimension);write('}')).
+ dimension2(Nbarbol,Nbdimension):-write('},{"nbdimension'),read(N),write(N),write('":"'),read(Nbdimension2),write(Nbdimension2),write('",'),puerta2(Nbarbol,Nbdimension,Nbdimension2).
+ puerta2(Nbarbol,Nbdimension,Nbdimension2):-write('"select '),write(Nbdimension2),write(','),write(Nbdimension),write(', '),write('count(*)/(select count(*)from '),write(Nbarbol),write(') from '),write(Nbarbol),write(' where '),write(Nbdimension),write(' in(select distinct '),write(Nbdimension),write(' from '),write(Nbarbol),write(') and '),write(Nbdimension2),write(' in(select distinct '),write(Nbdimension2),write(' from '),write(Nbarbol),write(') group by '),write(Nbdimension),write(','),write(Nbdimension2),write(' order by '),write(Nbdimension),write(';"'), aux1(Nbarbol,Nbdimension).
+ :-jproba.
+
+Entrada:
+empresas.
+materia.
+add.
+2.
+industria.
+add.
+3.
+infraestructura.
+
+Salida:
+{"jproba":{"nbarbol":"empresas", "frecuencia":"select count(*) from empresas;",{"nbdimension":"materia","select materia, count(*)/(select count(*)from empresas) from empresas where materia in(select distinct materia from empresas) group by materia;"},{"nbdimension2":"industria","select industria,materia, count(*)/(select count(*)from empresas) from empresas where materia in(select distinct materia from empresas) and industria in(select distinct industria from empresas) group by materia,industria order by materia;"},{"nbdimension3":"infraestructura","select infraestructura,materia, count(*)/(select count(*)from empresas) from empresas where materia in(select distinct materia from empresas) and infraestructura in(select distinct infraestructura from empresas) group by materia,infraestructura order by materia;"}}}
